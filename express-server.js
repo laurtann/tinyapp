@@ -10,12 +10,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 function generateRandomString() {
-  const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-  let random = "";
-  for (let i = 0; i < 6; i++) {
-    random += chars[Math.floor(Math.random() * Math.floor(37))];
-  }
-  return random;
+  // const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+  // let random = "";
+  // for (let i = 0; i < 6; i++) {
+  //   random += chars[Math.floor(Math.random() * Math.floor(37))];
+  // }
+  // return random;
+  const id = Math.random().toString(36).substring(2, 8);
+  return id;
 }
 
 const urlDatabase = {
@@ -67,6 +69,13 @@ app.post('/urls', (req, res) => {
 // delete my URLs
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
+})
+
+// edit longURL
+app.post('/urls/:shortURL', (req, res) => {
+  const long = req.body.longURL;
+  urlDatabase[req.params.shortURL] = long;
   res.redirect('/urls');
 })
 
