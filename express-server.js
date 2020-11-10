@@ -1,13 +1,15 @@
 const express = require("express");
 const app = express();
+const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
 app.use(bodyParser.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieParser());
 
 function generateRandomString() {
   // const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -40,17 +42,19 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+//here
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { username: req.cookies["username"] }
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"]};
   res.render("urls_show", templateVars);
 });
 
@@ -64,18 +68,30 @@ app.post('/urls', (req, res) => {
   const long = req.body.longURL;
   urlDatabase[short] = long;
   res.redirect(`/urls/${short}`);
-} );
+});
 
 // delete my URLs
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
-})
+});
 
 // edit longURL
 app.post('/urls/:shortURL', (req, res) => {
   const long = req.body.longURL;
   urlDatabase[req.params.shortURL] = long;
+  res.redirect('/urls');
+});
+
+//login
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
+// delete cookie
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
   res.redirect('/urls');
 })
 
