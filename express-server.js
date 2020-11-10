@@ -3,18 +3,18 @@ const app = express();
 const bodyParser = require("body-parser");
 const PORT = 8080; // default port 8080
 
-app.use(bodyParser.urlencoded({extended: true}));
-
 app.set("view engine", "ejs");
+
+app.use(bodyParser.json());
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 function generateRandomString() {
   let chars = "0123456789abcdefghijklmnopqrstuvwxyz";
   let random = "";
-
   for (let i = 0; i < 6; i++) {
     random += chars[Math.floor(Math.random() * Math.floor(37))];
   }
-
   return random;
 }
 
@@ -47,9 +47,18 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
+
+// first create short URL
+app.post('/urls', (req, res) => { 
+  let short = generateRandomString();
+  let long = req.body.longURL;
+  urlDatabase[short] = long;
+  console.log(urlDatabase);
+  res.redirect('/');
+} );
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
