@@ -23,9 +23,10 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+// Day 1 code
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
 
 // returns json string with urlDatabase object
 app.get("/urls.json", (req, res) => {
@@ -46,14 +47,8 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-
-
 app.get("/urls/:shortURL", (req, res) => {
-  // const shortURL = req.params.shortURL
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
-  // console.log(urlDatabase);
-  console.log(req.params);
-  console.log(urlDatabase[req.params.shortURL]);
   res.render("urls_show", templateVars);
 });
 
@@ -62,8 +57,6 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-// first create short URL
-
 app.post('/urls', (req, res) => { 
   const short = generateRandomString();
   const long = req.body.longURL;
@@ -71,7 +64,13 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${short}`);
 } );
 
+// delete my URLs
+app.post('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
+})
 
+// D1 Old code
 // app.post("/urls", (req, res) => {
 //   console.log(req.body);  // Log the POST request body to the console
 //   res.send("Ok");         // Respond with 'Ok' (we will replace this)
