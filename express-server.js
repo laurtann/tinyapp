@@ -64,18 +64,24 @@ app.post('/urls', (req, res) => {
   const long = req.body.longURL;
   urlDatabase[short] = long;
   res.redirect(`/urls/${short}`);
-} );
+});
 
 // delete my URLs
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
-})
+});
 
 // edit longURL
 app.post('/urls/:shortURL', (req, res) => {
   const long = req.body.longURL;
   urlDatabase[req.params.shortURL] = long;
+  res.redirect('/urls');
+});
+
+//login
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
   res.redirect('/urls');
 })
 
