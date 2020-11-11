@@ -28,16 +28,6 @@ const users = {
 
 };
 
-// // check if email exists in database
-// const checkUserEmail = function(database, email) {
-//   for (let user in database) {
-//     if (database[user].email === email) {
-//       return email;
-//     }
-//   }
-//   return false;
-// }
-
 // returns json string with urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -48,15 +38,20 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//here
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
+// make sure that user logged in to see this page
 app.get("/urls/new", (req, res) => {
+  if (req.cookies["user_id"]) { 
   const templateVars = { username: users[req.cookies["user_id"]] }
   res.render("urls_new", templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 app.get("/register", (req, res) => {
