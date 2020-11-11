@@ -26,11 +26,6 @@ const users = {
 
 };
 
-// Day 1 code
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
-
 // returns json string with urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -43,25 +38,26 @@ app.get("/hello", (req, res) => {
 
 //here
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
+  console.log("This is a cookie", req.cookies["user_id"]);
+  console.log("This is a user obj with cookie id", users[req.cookies["user_id"]]);
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies["username"] }
+  const templateVars = { username: users[req.cookies["user_id"]] }
   res.render("urls_new", templateVars);
 });
 
 app.get("/register", (req, res) => {
   const userID = req.cookies["user_id"];
-  const templateVars = { username: users[userID] };
-  console.log("This is a cookie", req.cookies);
-  setTimeout(function() { console.log("this is username ", users[userID]) }, 1000);
+  const templateVars = { username: users[req.cookies["user_id"]] };
   res.render("register", templateVars);
+  console.log("this is users obj", users);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 
@@ -110,24 +106,6 @@ app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
-
-//login
-// app.post('/login', (req, res) => {
-//   res.cookie('username', req.body.username);
-//   res.redirect('/urls');
-// });
-
-// delete cookie - DAY 2
-// app.post('/logout', (req, res) => {
-//   res.clearCookie('username');
-//   res.redirect('/urls');
-// });
-
-// D1 Old code
-// app.post("/urls", (req, res) => {
-//   console.log(req.body);  // Log the POST request body to the console
-//   res.send("Ok");         // Respond with 'Ok' (we will replace this)
-// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
