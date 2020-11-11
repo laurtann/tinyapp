@@ -27,6 +27,11 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// database of users
+const users = {
+
+};
+
 // Day 1 code
 // app.get("/", (req, res) => {
 //   res.send("Hello!");
@@ -51,6 +56,11 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = { username: req.cookies["username"] }
   res.render("urls_new", templateVars);
+});
+
+// get for request page
+app.get("/register", (req, res) => {
+  res.render("register");
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -92,6 +102,22 @@ app.post('/login', (req, res) => {
 // delete cookie
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
+  res.redirect('/urls');
+});
+
+// registration handler
+app.post('/register', (req, res) => {
+  // initialize user objs
+  let userID = generateRandomString();
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  }
+
+  console.log(users);
+  //cookie time
+  res.cookie('user_id', userID);
   res.redirect('/urls');
 })
 
