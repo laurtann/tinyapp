@@ -17,10 +17,12 @@ function generateRandomString() {
   return id;
 }
 
-// data
+// database of URLs
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  // "b2xVn2": "http://www.lighthouselabs.ca",
+  // "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 // database of users
@@ -44,11 +46,11 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// make sure that user logged in to see this page
+// make sure that user is logged in to see this page
 app.get("/urls/new", (req, res) => {
   if (req.cookies["user_id"]) { 
-  const templateVars = { username: users[req.cookies["user_id"]] }
-  res.render("urls_new", templateVars);
+    const templateVars = { username: users[req.cookies["user_id"]] }
+    res.render("urls_new", templateVars);
   } else {
     res.redirect('/urls');
   }
@@ -66,13 +68,13 @@ app.get("/login", (req, res) => {
 })
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: users[req.cookies["user_id"]]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, username: users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 
 // redirect to original website when shortURL put after /u/ slug
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -80,7 +82,8 @@ app.get("/u/:shortURL", (req, res) => {
 app.post('/urls', (req, res) => { 
   const short = generateRandomString();
   const long = req.body.longURL;
-  urlDatabase[short] = long;
+  urlDatabase[short] = { longURL: long, userID: req.cookies["user_id"] };
+  console.log(urlDatabase);
   res.redirect(`/urls/${short}`);
 });
 
@@ -109,7 +112,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 // edit longURL
 app.post('/urls/:shortURL', (req, res) => {
   const long = req.body.longURL;
-  urlDatabase[req.params.shortURL] = long;
+  urlDatabase[req.params.shortURL].longURL = long;
   res.redirect('/urls');
 });
 
