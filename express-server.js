@@ -60,10 +60,15 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const userID = req.cookies["user_id"];
   const templateVars = { username: users[req.cookies["user_id"]] };
   res.render("register", templateVars);
 });
+
+// get for new login page
+app.get("/login", (req, res) => {
+  const templateVars = { username: users[req.cookies["user_id"]] };
+  res.render("login", templateVars);
+})
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: users[req.cookies["user_id"]]};
@@ -85,10 +90,10 @@ app.post('/urls', (req, res) => {
 });
 
 //login - don't know if I still need this
-app.post('/login', (req, res) => {
-  // res.cookie('username', req.body.username);
-  res.redirect('/urls');
-});
+// app.post('/login', (req, res) => {
+//   // res.cookie('username', req.body.username);
+//   res.redirect('/urls');
+// });
 
 // delete my URLs
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -105,6 +110,7 @@ app.post('/urls/:shortURL', (req, res) => {
 
 // registration handler
 app.post('/register', (req, res) => {
+  // error handling
   if (!req.body.email || !req.body.password) {
     res.status(400);
     res.send("Please enter a valid email & password");
@@ -131,7 +137,7 @@ app.post('/register', (req, res) => {
   console.log(users);
 });
 
-// delete cookie
+// delete cookie on logout
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
@@ -140,5 +146,3 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-module.exports = { users };
