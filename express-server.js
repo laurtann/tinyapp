@@ -39,8 +39,6 @@ app.get("/hello", (req, res) => {
 //here
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
-  console.log("This is a cookie", req.cookies["user_id"]);
-  console.log("This is a user obj with cookie id", users[req.cookies["user_id"]]);
   res.render("urls_index", templateVars);
 });
 
