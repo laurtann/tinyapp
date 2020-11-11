@@ -1,10 +1,12 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const cookieParser = require('cookie-parser')
-const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const handleRegErrors = require('./helpers.js');
+const checkUserEmail = require('./helpers.js');
 const PORT = 8080; // default port 8080
 
-app.set("view engine", "ejs");
+app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,6 +18,7 @@ function generateRandomString() {
   return id;
 }
 
+// data
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -25,6 +28,11 @@ const urlDatabase = {
 const users = {
 
 };
+
+// email fetcher
+function emailFetcher(userObj) {
+  const userEmail = users
+}
 
 // returns json string with urlDatabase object
 app.get("/urls.json", (req, res) => {
@@ -51,7 +59,6 @@ app.get("/register", (req, res) => {
   const userID = req.cookies["user_id"];
   const templateVars = { username: users[req.cookies["user_id"]] };
   res.render("register", templateVars);
-  console.log("this is users obj", users);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -59,11 +66,13 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// redirect to original website when shortURL put after /u/ slug
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
+// update urlDatabase with new short/long pair
 app.post('/urls', (req, res) => { 
   const short = generateRandomString();
   const long = req.body.longURL;
@@ -108,3 +117,5 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+module.exports = { users };
