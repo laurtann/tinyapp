@@ -1,11 +1,18 @@
 // check if email exists in database
-const checkUserEmail = function(database, email) {
-  for (let user in database) {
-    if (database[user].email === email) {
-      return email;
+const authenticateUser = function(database, email, password) {
+  if (password === undefined) {
+    for (let user in database) {
+      if (database[user].email === email) {
+        return user;
+      }
     }
-  }
-  return false;
+  } else {
+    for (let user in database) {
+      if (database[user].email === email && database[user].password === password) {
+        return user;
+      }
+    }
+  } return false;
 }
 
-module.exports =  checkUserEmail;
+module.exports =  authenticateUser;

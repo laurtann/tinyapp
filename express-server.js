@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const checkUserEmail = require('./helpers.js');
+const authenticateUser = require('./helpers.js');
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
@@ -89,11 +89,21 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${short}`);
 });
 
-//login - don't know if I still need this
-// app.post('/login', (req, res) => {
-//   // res.cookie('username', req.body.username);
-//   res.redirect('/urls');
-// });
+// login post
+app.post('/login', (req, res) => {
+  if (authenticateUser(users, req.body.email) === false) {
+    res.status(403);
+    res.send("Email not found, please register");
+    return;
+  } else if (authenticateUser(users, req.body.email, req.body.password) === false) {
+    res.status(403);
+    res.send("Incorrect password, please try again");
+    return;
+  } else {
+    res.cookie('user_id', authenticateUser(users, req.body.email, req.body.password));
+    res.redirect('/urls');
+  }
+});
 
 // delete my URLs
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -116,7 +126,7 @@ app.post('/register', (req, res) => {
     res.send("Please enter a valid email & password");
     return;
   }
-  if (checkUserEmail(users, req.body.email) !== false) {
+  if (authenticateUser(users, req.body.email) !== false) {
     res.status(400);
     res.send("Email already exists, please log in");
     return;
