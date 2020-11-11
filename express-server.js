@@ -12,12 +12,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 function generateRandomString() {
-  // const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-  // let random = "";
-  // for (let i = 0; i < 6; i++) {
-  //   random += chars[Math.floor(Math.random() * Math.floor(37))];
-  // }
-  // return random;
   const id = Math.random().toString(36).substring(2, 8);
   return id;
 }
@@ -49,22 +43,25 @@ app.get("/hello", (req, res) => {
 
 //here
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: users[req.cookies["user_id"]] }
+  const templateVars = { username: req.cookies["username"] }
   res.render("urls_new", templateVars);
 });
 
-// get for request page
 app.get("/register", (req, res) => {
-  res.render("register");
+  const userID = req.cookies["user_id"];
+  const templateVars = { username: users[userID] };
+  console.log("This is a cookie", req.cookies);
+  setTimeout(function() { console.log("this is username ", users[userID]) }, 1000);
+  res.render("register", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: users[req.cookies["user_id"]]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"]};
   res.render("urls_show", templateVars);
 });
 
@@ -73,7 +70,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post('/urls', (req, res) => { s
+app.post('/urls', (req, res) => { 
   const short = generateRandomString();
   const long = req.body.longURL;
   urlDatabase[short] = long;
@@ -93,18 +90,6 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
-//login
-// app.post('/login', (req, res) => {
-//   res.cookie('username', req.body.username);
-//   res.redirect('/urls');
-// });
-
-// delete cookie
-app.post('/logout', (req, res) => {
-  res.clearCookie('username');
-  res.redirect('/urls');
-});
-
 // registration handler
 app.post('/register', (req, res) => {
   // initialize user objs
@@ -115,11 +100,28 @@ app.post('/register', (req, res) => {
     password: req.body.password
   }
 
-  console.log(users);
-  //cookie time
+  // create cookie
   res.cookie('user_id', userID);
   res.redirect('/urls');
-})
+});
+
+// delete cookie
+app.post('/logout', (req, res) => {
+  res.clearCookie('user_id');
+  res.redirect('/urls');
+});
+
+//login
+// app.post('/login', (req, res) => {
+//   res.cookie('username', req.body.username);
+//   res.redirect('/urls');
+// });
+
+// delete cookie - DAY 2
+// app.post('/logout', (req, res) => {
+//   res.clearCookie('username');
+//   res.redirect('/urls');
+// });
 
 // D1 Old code
 // app.post("/urls", (req, res) => {
@@ -130,4 +132,3 @@ app.post('/register', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
