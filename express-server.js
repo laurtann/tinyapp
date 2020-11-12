@@ -21,8 +21,8 @@ function generateRandomString() {
 const urlDatabase = {
   // "b2xVn2": "http://www.lighthouselabs.ca",
   // "9sm5xK": "http://www.google.com"
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  // b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  // i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 // database of users
@@ -89,18 +89,26 @@ app.post('/urls', (req, res) => {
 
 // login post
 app.post('/login', (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(400);
+    res.send("Please enter a valid email & password");
+    return;
+  };
+
   if (authenticateUser(users, req.body.email) === false) {
     res.status(403);
     res.send("Email not found, please register");
     return;
-  } else if (authenticateUser(users, req.body.email, req.body.password) === false) {
+  };
+
+  if (authenticateUser(users, req.body.email, req.body.password) === false) {
     res.status(403);
     res.send("Incorrect password, please try again");
     return;
-  } else {
-    res.cookie('user_id', authenticateUser(users, req.body.email, req.body.password));
-    res.redirect('/urls');
-  }
+  };
+
+  res.cookie('user_id', authenticateUser(users, req.body.email, req.body.password));
+  res.redirect('/urls');
 });
 
 // delete my URLs
@@ -123,12 +131,13 @@ app.post('/register', (req, res) => {
     res.status(400);
     res.send("Please enter a valid email & password");
     return;
-  }
+  };
+
   if (authenticateUser(users, req.body.email) !== false) {
     res.status(400);
     res.send("Email already exists, please log in");
     return;
-  }
+  };
 
   // initialize user objs
   const userID = generateRandomString();
