@@ -70,6 +70,10 @@ app.get("/register", (req, res) => {
 
 // get for new login page
 app.get("/login", (req, res) => {
+  if (req.cookies["user_id"]) {
+    res.redirect('/urls');
+    return;
+  }
   const templateVars = { username: users[req.cookies["user_id"]] };
   res.render("login", templateVars);
 })
@@ -83,8 +87,16 @@ app.get("/login", (req, res) => {
 //YAAASSSSSSSSSSS
 app.get("/urls/:shortURL", (req, res) => {
   // getting userURL obj
-  const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
   const short = req.params.shortURL;
+  let userURLs;
+  if (req.cookies["user_id"]) {
+    userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
+  } else {
+    res.status(401);
+    res.send("You are not authorized to view this Short Link, please Log In");
+    return;
+  };
+  
   // if short exists
   if (urlDatabase[short]) {
     //if user is logged in and url exists
