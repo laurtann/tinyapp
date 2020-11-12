@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-// const authenticateUser = require('./helpers.js');
 const PORT = 8080; // default port 8080
 
 const { authenticateUser, urlsForUser } = require('./helpers');
@@ -24,6 +23,15 @@ const urlDatabase = {};
 
 // database of users
 const users = {};
+
+// redirect from home page
+app.get('/', (req, res) => {
+  if (req.cookies['user_id']) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login')
+  }
+})
 
 // returns json string with urlDatabase object
 app.get("/urls.json", (req, res) => {
@@ -52,6 +60,10 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.cookies["user_id"]) {
+    res.redirect('/urls');
+    return;
+  }
   const templateVars = { username: users[req.cookies["user_id"]] };
   res.render("register", templateVars);
 });
@@ -62,9 +74,31 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 })
 
+// old
+// app.get("/urls/:shortURL", (req, res) => {
+//   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, username: users[req.cookies["user_id"]]};
+//   res.render("urls_show", templateVars);
+// });
+
+//YAAASSSSSSSSSSS
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], username: users[req.cookies["user_id"]]};
-  res.render("urls_show", templateVars);
+  // getting userURL obj
+  const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
+  const short = req.params.shortURL;
+  // if short exists
+  if (urlDatabase[short]) {
+    //if user is logged in and url exists
+    if (userURLs[short] && req.cookies["user_id"]) {
+      const templateVars = { shortURL: short, longURL: urlDatabase[short].longURL, username: users[req.cookies["user_id"]]};
+      res.render("urls_show", templateVars);
+    } else {
+      res.status(401);
+      res.send("You are not authorized to view this Short Link");
+    }
+  } else {
+    res.status(404);
+    res.send("This short URL does not exist");
+  }
 });
 
 // redirect to original website when shortURL put after /u/ slug
@@ -121,20 +155,29 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   return;
 });
 
+// edit longURL
+app.post('/urls/:shortURL', (req, res) => {
+  const long = req.body.longURL;
+  urlDatabase[req.params.shortURL] = long;
+  res.redirect('/urls');
+});
+
 // // edit longURL
 app.post('/urls/:shortURL', (req, res) => {
   const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
+  console.log(userURLs);
 
-  for (let short in userURLs) {
+  for (const short in userURLs) {
     if (short === req.params.shortURL) {
       urlDatabase[req.params.shortURL].longURL = req.body.newURL;
       res.redirect('/urls');
       return;
+    } else {
+      res.status(401);
+      res.send("You are not authorized to edit this URL");
+      return;
     }
   };
-
-  res.status(401);
-  res.send("You are not authorized to edit this URL");
 });
 
 
@@ -164,8 +207,6 @@ app.post('/register', (req, res) => {
   // create cookie
   res.cookie('user_id', userID);
   res.redirect('/urls');
-
-  console.log(users);
 });
 
 // delete cookie on logout
