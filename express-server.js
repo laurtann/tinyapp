@@ -2,9 +2,10 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 const PORT = 8080; // default port 8080
 
-const { authenticateUser, urlsForUser } = require('./helpers');
+const { fetchUserFromEmail, urlsForUser } = require('./helpers');
 
 app.set('view engine', 'ejs');
 
@@ -133,26 +134,29 @@ app.post('/urls', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+
   if (!email || !password) {
     res.status(400);
     res.send("Please enter a valid email & password");
     return;
   };
 
-  if (authenticateUser(users, email) === false) {
+  const userFromEmail = fetchUserFromEmail(users, email);
+  if (userFromEmail === false) {
     res.status(403);
     res.send("Email not found, please register");
     return;
+  } else {
+    const userID = userFromEmail.id;
+    if (bcrypt.compareSync(password, userID.password) === false) {
+      res.status(401);
+      res.send("Incorrect password, please try again");
+      return;
+    } else {
+      res.cookie('user_id', fetchUserFromEmail(users, email));
+      res.redirect('/urls');
+    };
   };
-
-  if (authenticateUser(users, email, password) === false) {
-    res.status(403);
-    res.send("Incorrect password, please try again");
-    return;
-  };
-
-  res.cookie('user_id', authenticateUser(users, email, password));
-  res.redirect('/urls');
 });
 
 // delete my URLs
@@ -194,25 +198,27 @@ app.post('/urls/:shortURL', (req, res) => {
 app.post('/register', (req, res) => {
   // error handling
   const email = req.body.email;
-  const password = req.body.password
+  const password = req.body.password;
   if (!email || !password) {
     res.status(400);
     res.send("Please enter a valid email & password");
     return;
   };
 
-  if (authenticateUser(users, email) !== false) {
+  if (fetchUserFromEmail(users, email) !== false) {
     res.status(400);
     res.send("Email already exists, please log in");
     return;
   };
 
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   // initialize user objs
   const userID = generateRandomString();
   users[userID] = {
     id: userID,
-    email: req.body.email,
-    password: req.body.password
+    email: email,
+    password: hashedPassword
   }
 
   // create cookie
