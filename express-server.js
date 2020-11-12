@@ -19,7 +19,6 @@ function generateRandomString() {
   return id;
 }
 
-
 // database of URLs
 const urlDatabase = {};
 
@@ -64,7 +63,7 @@ app.get("/login", (req, res) => {
 })
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, username: users[req.cookies["user_id"]]};
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]["longURL"], username: users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 
@@ -122,20 +121,21 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   return;
 });
 
-
-// edit longURL
-app.post('/urls/:shortURL', (req, res) => {
-  const long = req.body.longURL;
-  urlDatabase[req.params.shortURL].longURL = long;
-  res.redirect('/urls');
-});
-
 // // edit longURL
-// app.post('/urls/:shortURL', (req, res) => {
-//   const long = req.body.longURL;
-//   urlDatabase[req.params.shortURL].longURL = long;
-//   res.redirect('/urls');
-// });
+app.post('/urls/:shortURL', (req, res) => {
+  const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
+
+  for (let short in userURLs) {
+    if (short === req.params.shortURL) {
+      urlDatabase[req.params.shortURL].longURL = req.body.newURL;
+      res.redirect('/urls');
+      return;
+    }
+  };
+
+  res.status(401);
+  res.send("You are not authorized to edit this URL");
+});
 
 
 // registration handler
