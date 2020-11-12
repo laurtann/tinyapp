@@ -108,9 +108,20 @@ app.post('/login', (req, res) => {
 
 // delete my URLs
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  const userURLs = urlsForUser(req.cookies["user_id"], urlDatabase);
+  for (let short in userURLs) {
+    if (short === req.params.shortURL) {
+      delete urlDatabase[req.params.shortURL];
+      res.redirect('/urls');
+      return;
+    }
+  }
+
+  res.status(401);
+  res.send("You are not authorized to delete this URL");
+  return;
 });
+
 
 // edit longURL
 app.post('/urls/:shortURL', (req, res) => {
@@ -118,6 +129,14 @@ app.post('/urls/:shortURL', (req, res) => {
   urlDatabase[req.params.shortURL].longURL = long;
   res.redirect('/urls');
 });
+
+// // edit longURL
+// app.post('/urls/:shortURL', (req, res) => {
+//   const long = req.body.longURL;
+//   urlDatabase[req.params.shortURL].longURL = long;
+//   res.redirect('/urls');
+// });
+
 
 // registration handler
 app.post('/register', (req, res) => {
