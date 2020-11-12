@@ -15,4 +15,15 @@ const authenticateUser = function(database, email, password) {
   } return false;
 }
 
-module.exports =  authenticateUser;
+// function to check URLs in database
+const urlsForUser = function(id, urlDB) {
+  const userUrls = {};
+  for (const short in urlDB) {
+    if (urlDB[short].userID === id) {
+      userUrls[short] = urlDB[short];
+    } 
+  } 
+  return userUrls;
+};
+
+module.exports = { authenticateUser, urlsForUser };

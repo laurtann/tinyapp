@@ -2,8 +2,10 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const authenticateUser = require('./helpers.js');
+// const authenticateUser = require('./helpers.js');
 const PORT = 8080; // default port 8080
+
+const { authenticateUser, urlsForUser } = require('./helpers');
 
 app.set('view engine', 'ejs');
 
@@ -17,18 +19,12 @@ function generateRandomString() {
   return id;
 }
 
+
 // database of URLs
-const urlDatabase = {
-  // "b2xVn2": "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com"
-  // b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  // i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
-};
+const urlDatabase = {};
 
 // database of users
-const users = {
-
-};
+const users = {};
 
 // returns json string with urlDatabase object
 app.get("/urls.json", (req, res) => {
@@ -40,9 +36,9 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-
+// user can only see own links
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: users[req.cookies["user_id"]] };
+  const templateVars = { urls: urlsForUser(req.cookies["user_id"], urlDatabase), username: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
@@ -83,7 +79,6 @@ app.post('/urls', (req, res) => {
   const short = generateRandomString();
   const long = req.body.longURL;
   urlDatabase[short] = { longURL: long, userID: req.cookies["user_id"] };
-  console.log(urlDatabase);
   res.redirect(`/urls/${short}`);
 });
 
