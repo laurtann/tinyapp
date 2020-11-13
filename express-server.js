@@ -158,7 +158,6 @@ app.post('/register', (req, res) => {
   }
 
   const hashedPassword = bcrypt.hashSync(password, 10);
-  console.log("hash ", hashedPassword);
 
   // initialize user objs
   const userID = generateRandomString();
