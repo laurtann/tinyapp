@@ -24,4 +24,4 @@ This was done as part of Lighthouse Labs Web Development bootcamp over four days
 ## Getting Started
 
 - Install all dependencies (using the `npm install` command).
-- Run the development web server using the `node express_server.js` command.
+- Run the development web server using the `node express-server.js` command.
