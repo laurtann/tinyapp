@@ -20,7 +20,7 @@ app.use(
 );
 
 const generateRandomString = function() {
-  const id = Math.random().toString(36).substring(2, 8);
+  const id = Math.random().toString(36).substring(2, 5);
   return id;
 };
 
@@ -169,6 +169,7 @@ app.post('/register', (req, res) => {
 
   // create cookie
   req.session['user_id'] = userID;
+  req.session['order_id'] = 123;
   res.redirect('/urls');
 });
 
@@ -203,6 +204,7 @@ app.post('/login', (req, res) => {
 
 // delete user URLs and permission handling
 app.post('/urls/:shortURL/delete', (req, res) => {
+  const orderID = req.session.order_id;
   const userID = req.session.user_id;
   const short = req.params.shortURL;
   const userURLs = urlsForUser(userID, urlDatabase);
@@ -210,6 +212,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (userURLs[short]) {
     delete urlDatabase[short];
     delete userURLs[short];
+    console.log(orderID);
+    console.log(userID);
     res.redirect('/urls');
     return;
   }
