@@ -3,13 +3,11 @@ const app = express();
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-// const PORT = 8080; // default port 8080
 
 const { fetchUserFromEmail, urlsForUser } = require('./helpers');
 
 app.set('view engine', 'ejs');
 
-// app.use(express.static('dist'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
