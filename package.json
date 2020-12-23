@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "express-server.js",
+  "engines": {
+    "node": "12.x"
+  },
   "scripts": {
     "start": "./node_modules/.bin/nodemon -L express-server.js",
     "test": "./node_modules/mocha/bin/mocha"
@@ -24,7 +27,7 @@
     "cookie-parser": "^1.4.5",
     "cookie-session": "^1.4.0",
     "ejs": "^3.1.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
   },
   "devDependencies": {
     "chai": "^4.2.0",
