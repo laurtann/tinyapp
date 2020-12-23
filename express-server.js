@@ -3,6 +3,7 @@ const app = express();
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const PORT = process.env.PORT || 8080;
 
 const { fetchUserFromEmail, urlsForUser } = require('./helpers');
 
@@ -244,6 +245,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log(`Example app listening!!`);
+app.listen(PORT, () => {
+  console.log(`Example app listening on ${PORT}`);
 });
