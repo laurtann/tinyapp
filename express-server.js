@@ -9,6 +9,7 @@ const { fetchUserFromEmail, urlsForUser } = require('./helpers');
 
 app.set('view engine', 'ejs');
 
+app.use(express.static('/'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -245,6 +246,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-// app.listen(PORT, () => {
-//   console.log(`Example app listening on port ${PORT}!`);
-// });
+app.listen(process.env.PORT || 8080, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
