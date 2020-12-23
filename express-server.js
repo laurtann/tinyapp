@@ -3,7 +3,7 @@ const app = express();
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-const PORT = 8080; // default port 8080
+// const PORT = 8080; // default port 8080
 
 const { fetchUserFromEmail, urlsForUser } = require('./helpers');
 
@@ -98,7 +98,7 @@ app.get("/urls/:shortURL", (req, res) => {
     res.send("You are not authorized to view this Short Link, please Log In");
     return;
   }
-  
+
   if (urlDatabase[short]) {
     if (userURLs[short] && userID) {
       const long = urlDatabase[short].longURL;
@@ -245,6 +245,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Example app listening on port ${PORT}!`);
+// });
