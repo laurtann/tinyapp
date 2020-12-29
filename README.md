@@ -1,6 +1,10 @@
 # TinyApp Project
 
+### Watch it in Action! Tinyapp is Live [Here](https://tinyapp-laurtann.herokuapp.com/urls)
+
 TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
+
+Users can register and login. Each user is tracked with a cookie. Only logged in users can create & edit their own links.
 
 This was done as part of Lighthouse Labs Web Development bootcamp over four days and was the first introduction to back-end development. CSS styling was a minor element of this project. 
 
