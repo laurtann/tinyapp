@@ -106,7 +106,9 @@ app.get("/urls/:shortURL", (req, res) => {
       res.render("urls_show", templateVars);
     } else {
       res.status(401);
-      res.send("You are not authorized to view this Short Link.");
+      const templateVars = { message: "You are not authorized to view this Short Link."};
+      res.render("urls_error", templateVars);
+      // res.send("You are not authorized to view this Short Link.");
     }
   } else {
     res.status(404);
@@ -119,7 +121,9 @@ app.get("/u/:shortURL", (req, res) => {
   const short = req.params.shortURL;
   if (!urlDatabase[short]) {
     res.status(404);
-    res.send("This short link does not exist, please try again.");
+    const templateVars = { message: "This short link does not exist, please try again."};
+    res.render("urls_error", templateVars);
+    // res.send("This short link does not exist, please try again.");
     return;
   }
   const long = urlDatabase[short].longURL;
@@ -130,7 +134,9 @@ app.get("/u/:shortURL", (req, res) => {
 app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     res.status(403);
-    res.send("Please Log In To View Your URLs & Short Links");
+    const templateVars = { message: "Please Log In To View Your URLs & Short Links"};
+    res.render("urls_error", templateVars);
+    // res.send("Please Log In To View Your URLs & Short Links");
     return;
   }
   const short = generateRandomString();
@@ -147,13 +153,17 @@ app.post('/register', (req, res) => {
   const password = req.body.password;
   if (!email || !password) {
     res.status(400);
-    res.send("Please enter a valid email & password");
+    const templateVars = { message: "Please enter a valid email & password"};
+    res.render("urls_error", templateVars);
+    // res.send("Please enter a valid email & password");
     return;
   }
 
   if (fetchUserFromEmail(users, email) !== false) {
     res.status(400);
-    res.send("Email already exists, please log in");
+    const templateVars = { message: "Email already exists, please log in"};
+    res.render("urls_error", templateVars);
+    // res.send("Email already exists, please log in");
     return;
   }
 
@@ -182,18 +192,24 @@ app.post('/login', (req, res) => {
 
   if (!email || !password) {
     res.status(400);
-    res.send("Please enter a valid email & password");
+    const templateVars = { message: "Please enter a valid email & password"};
+    res.render("urls_error", templateVars);
+    // res.send("Please enter a valid email & password");
     return;
   }
 
   if (userFromEmail === false) {
     res.status(403);
-    res.send("Email not found, please register");
+    const templateVars = { message: "Email not found, please register"};
+    res.render("urls_error", templateVars);
+    // res.send("Email not found, please register");
     return;
   } else {
     if (!bcrypt.compareSync(password, hashedPassword)) {
       res.status(401);
-      res.send("Incorrect password, please try again");
+      const templateVars = { message: "Incorrect password, please try again"};
+      res.render("urls_error", templateVars);
+      // res.send("Incorrect password, please try again");
       return;
     } else {
       req.session.user_id = userFromEmail.id;
@@ -219,7 +235,9 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 
   res.status(401);
-  res.send("You are not authorized to delete this URL");
+  const templateVars = { message: "You are not authorized to delete this URL"};
+  res.render("urls_error", templateVars);
+  // res.send("You are not authorized to delete this URL");
   return;
 });
 
@@ -235,7 +253,9 @@ app.post('/urls/:shortURL', (req, res) => {
     return;
   } else {
     res.status(401);
-    res.send("You are not authorized to edit this URL");
+    const templateVars = { message: "You are not authorized to edit this URL"};
+    res.render("urls_error", templateVars);
+    // res.send("You are not authorized to edit this URL");
   }
 });
 
