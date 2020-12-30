@@ -95,35 +95,36 @@ app.get("/urls/:shortURL", (req, res) => {
     userURLs = urlsForUser(userID, urlDatabase);
   } else {
     res.status(401);
-    res.send("You are not authorized to view this Short Link, please Log In");
+    const templateVars = { message: "You are not authorized to view this Short Link, please Log In", username: users[userID] };
+    res.render("urls_error", templateVars);
     return;
   }
 
   if (urlDatabase[short]) {
     if (userURLs[short] && userID) {
       const long = urlDatabase[short].longURL;
-      const templateVars = { shortURL: short, longURL: long, username: users[userID]};
+      const templateVars = { shortURL: short, longURL: long, username: users[userID] };
       res.render("urls_show", templateVars);
     } else {
       res.status(401);
-      const templateVars = { message: "You are not authorized to view this Short Link."};
+      const templateVars = { message: "You are not authorized to view this Short Link.", username: users[userID] };
       res.render("urls_error", templateVars);
-      // res.send("You are not authorized to view this Short Link.");
     }
   } else {
     res.status(404);
-    res.send("This short URL does not exist");
+    const templateVars = { message: "This short URL does not exist", username: users[userID] };
+    res.render("urls_error", templateVars);
   }
 });
 
 // redirect to original website when shortURL put after /u/ slug
 app.get("/u/:shortURL", (req, res) => {
   const short = req.params.shortURL;
+  const userID = req.session.user_id;
   if (!urlDatabase[short]) {
     res.status(404);
-    const templateVars = { message: "This short link does not exist, please try again."};
+    const templateVars = { message: "This short link does not exist, please try again.", username: users[userID] };
     res.render("urls_error", templateVars);
-    // res.send("This short link does not exist, please try again.");
     return;
   }
   const long = urlDatabase[short].longURL;
@@ -132,16 +133,15 @@ app.get("/u/:shortURL", (req, res) => {
 
 // update urlDatabase with new short/long pair
 app.post('/urls', (req, res) => {
-  if (!req.session.user_id) {
+  const userID = req.session.user_id;
+  if (!userID) {
     res.status(403);
-    const templateVars = { message: "Please Log In To View Your URLs & Short Links"};
+    const templateVars = { message: "Please Log In To View Your URLs & Short Links", username: users[userID] };
     res.render("urls_error", templateVars);
-    // res.send("Please Log In To View Your URLs & Short Links");
     return;
   }
   const short = generateRandomString();
   const long = req.body.longURL;
-  const userID = req.session.user_id;
   urlDatabase[short] = { longURL: long, userID: userID };
   res.redirect(`/urls/${short}`);
 });
@@ -153,17 +153,15 @@ app.post('/register', (req, res) => {
   const password = req.body.password;
   if (!email || !password) {
     res.status(400);
-    const templateVars = { message: "Please enter a valid email & password"};
+    const templateVars = { message: "Please enter a valid email & password", username: null };
     res.render("urls_error", templateVars);
-    // res.send("Please enter a valid email & password");
     return;
   }
 
   if (fetchUserFromEmail(users, email) !== false) {
     res.status(400);
-    const templateVars = { message: "Email already exists, please log in"};
+    const templateVars = { message: "Email already exists, please log in", username: users[userID] };
     res.render("urls_error", templateVars);
-    // res.send("Email already exists, please log in");
     return;
   }
 
@@ -192,24 +190,21 @@ app.post('/login', (req, res) => {
 
   if (!email || !password) {
     res.status(400);
-    const templateVars = { message: "Please enter a valid email & password"};
+    const templateVars = { message: "Please enter a valid email & password", username: null };
     res.render("urls_error", templateVars);
-    // res.send("Please enter a valid email & password");
     return;
   }
 
   if (userFromEmail === false) {
     res.status(403);
-    const templateVars = { message: "Email not found, please register"};
+    const templateVars = { message: "Email not found, please register", username: null };
     res.render("urls_error", templateVars);
-    // res.send("Email not found, please register");
     return;
   } else {
     if (!bcrypt.compareSync(password, hashedPassword)) {
       res.status(401);
-      const templateVars = { message: "Incorrect password, please try again"};
+      const templateVars = { message: "Incorrect password, please try again", username: null };
       res.render("urls_error", templateVars);
-      // res.send("Incorrect password, please try again");
       return;
     } else {
       req.session.user_id = userFromEmail.id;
@@ -235,9 +230,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 
   res.status(401);
-  const templateVars = { message: "You are not authorized to delete this URL"};
+  const templateVars = { message: "You are not authorized to delete this URL", username: users[userID] };
   res.render("urls_error", templateVars);
-  // res.send("You are not authorized to delete this URL");
   return;
 });
 
@@ -253,9 +247,8 @@ app.post('/urls/:shortURL', (req, res) => {
     return;
   } else {
     res.status(401);
-    const templateVars = { message: "You are not authorized to edit this URL"};
+    const templateVars = { message: "You are not authorized to edit this URL", username: users[userID] };
     res.render("urls_error", templateVars);
-    // res.send("You are not authorized to edit this URL");
   }
 });
 
