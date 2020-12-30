@@ -20,7 +20,7 @@ app.use(
 );
 
 const generateRandomString = function() {
-  const id = Math.random().toString(36).substring(2, 5);
+  const id = Math.random().toString(36).substring(2, 8);
   return id;
 };
 
