@@ -9,9 +9,9 @@
       <h3>Please Log In to View Your URLs & Create Short Links</h3>
     <% } else { %>
     <h3>My URLs</h3>
-    <!-- <h5> 
-      <a href = "#">Make Your Own Short URL Here</a>
-    </h5> -->
+    <p>
+      To use your shortURL, go to https://tinyapp-laurtann.herokuapp.com/u/[short URL]
+    </p>
     <table class="table">
       <thead>
         <tr>
@@ -34,7 +34,7 @@
             <td>
               <form method="POST" action="/urls/<%= url %>/delete">
                 <button type="submit" class="btn btn-outline-danger">Delete</button>
-              </form> 
+              </form>
             </td>
           </tr>
         <% } %>
